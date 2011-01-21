@@ -10,7 +10,7 @@ probably need are these ::
   >>> extjs.basic.need()
   >>> extjs.basic_with_ux.need()
 
-You can also include individual resources:
+You can also include individual resources ::
 
   >>> from js.extjs import adapter, extjs, ux
   >>> adapter.ext.need()
@@ -21,7 +21,7 @@ You can also include individual resources:
   >>> ux.js.need()
   >>> ux.css.need()
 
-You can also import themes:
+You can also import themes ::
 
   >>> from js.extjs import theme
   >>> theme.gray.need()
