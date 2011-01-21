@@ -1,6 +1,6 @@
 from fanstatic import Resource
 from library import library
-from . import extjs
+import extjs
 
 defaultThemes = [ 'gray', 'access' ]   # what about vista?
 themes = {}

@@ -1,6 +1,6 @@
 from library import library
 from fanstatic import Resource, GroupResource
-from . import extjs
+import extjs
 
 js = Resource(library, 'examples/ux/ux-all.js',
                   debug   = 'examples/ux/ux-all-debug.js',

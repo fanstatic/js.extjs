@@ -39,7 +39,7 @@ setup(
         ],
     entry_points={
         'fanstatic.libraries': [
-            'extjs = js.extjs:library',
+            'extjs = js.extjs.library:library',
             ],
         },
     )
