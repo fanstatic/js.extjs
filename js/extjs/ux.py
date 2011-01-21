@@ -9,6 +9,6 @@ js = Resource(library, 'examples/ux/ux-all.js',
 css = Resource(library, 'examples/ux/css/ux-all.css',
                    depends = [extjs.css] )
 
-ux = GroupResource( [js, css] )
+all = GroupResource( [js, css] )
 
-basic_with_ux = GroupResource( [extjs.basic, ux] )
+basic_with_ux = GroupResource( [extjs.basic, all] )

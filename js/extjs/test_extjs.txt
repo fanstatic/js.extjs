@@ -16,7 +16,8 @@ You can also include individual resources:
   >>> adapter.ext.need()
   >>> extjs.js.need()
   >>> extjs.css.need()
-  >>> ux.ux.need()
+  >>> extjs.all.need()
+  >>> ux.all.need()
   >>> ux.js.need()
   >>> ux.css.need()
 
