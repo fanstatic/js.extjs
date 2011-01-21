@@ -1,8 +1,4 @@
-import library
-import adapter
-import extjs
-import theme
-import ux
+from js.extjs import library, adapter, extjs, theme, ux
 
 # convenience
 from extjs import basic
