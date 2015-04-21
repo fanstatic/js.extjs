@@ -1,146 +1,214 @@
-/*!
- * Ext JS Library 3.3.1
- * Copyright(c) 2006-2010 Sencha Inc.
- * licensing@sencha.com
- * http://www.sencha.com/license
+/**
+ * UX used to provide a spotlight around a specified component/element.
  */
-Ext.ux.Spotlight = function(config){
-    Ext.apply(this, config);
-}
-Ext.ux.Spotlight.prototype = {
-    active : false,
-    animate : true,
-    duration: .25,
-    easing:'easeNone',
+Ext.define('Ext.ux.Spotlight', {
+    /**
+     * @private
+     * The baseCls for the spotlight elements
+     */
+    baseCls: 'x-spotlight',
 
-    // private
-    animated : false,
+    /**
+     * @cfg animate {Boolean} True to animate the spotlight change
+     * (defaults to true)
+     */
+    animate: true,
 
-    createElements : function(){
-        var bd = Ext.getBody();
+    /**
+     * @cfg duration {Integer} The duration of the animation, in milliseconds
+     * (defaults to 250)
+     */
+    duration: 250,
 
-        this.right = bd.createChild({cls:'x-spotlight'});
-        this.left = bd.createChild({cls:'x-spotlight'});
-        this.top = bd.createChild({cls:'x-spotlight'});
-        this.bottom = bd.createChild({cls:'x-spotlight'});
+    /**
+     * @cfg easing {String} The type of easing for the spotlight animatation
+     * (defaults to null)
+     */
+    easing: null,
 
-        this.all = new Ext.CompositeElement([this.right, this.left, this.top, this.bottom]);
+    /**
+     * @private
+     * True if the spotlight is active on the element
+     */
+    active: false,
+    
+    constructor: function(config){
+        Ext.apply(this, config);
     },
 
-    show : function(el, callback, scope){
-        if(this.animated){
-            this.show.defer(50, this, [el, callback, scope]);
-            return;
+    /**
+     * Create all the elements for the spotlight
+     */
+    createElements: function() {
+        var me = this,
+            baseCls = me.baseCls,
+            body = Ext.getBody();
+
+        me.right = body.createChild({
+            cls: baseCls
+        });
+        me.left = body.createChild({
+            cls: baseCls
+        });
+        me.top = body.createChild({
+            cls: baseCls
+        });
+        me.bottom = body.createChild({
+            cls: baseCls
+        });
+
+        me.all = Ext.create('Ext.CompositeElement', [me.right, me.left, me.top, me.bottom]);
+    },
+
+    /**
+     * Show the spotlight
+     */
+    show: function(el, callback, scope) {
+        var me = this;
+        
+        //get the target element
+        me.el = Ext.get(el);
+
+        //create the elements if they don't already exist
+        if (!me.right) {
+            me.createElements();
         }
-        this.el = Ext.get(el);
-        if(!this.right){
-            this.createElements();
-        }
-        if(!this.active){
-            this.all.setDisplayed('');
-            this.applyBounds(true, false);
-            this.active = true;
-            Ext.EventManager.onWindowResize(this.syncSize, this);
-            this.applyBounds(false, this.animate, false, callback, scope);
-        }else{
-            this.applyBounds(false, false, false, callback, scope); // all these booleans look hideous
+
+        if (!me.active) {
+            //if the spotlight is not active, show it
+            me.all.setDisplayed('');
+            me.active = true;
+            Ext.EventManager.onWindowResize(me.syncSize, me);
+            me.applyBounds(me.animate, false);
+        } else {
+            //if the spotlight is currently active, just move it
+            me.applyBounds(false, false);
         }
     },
 
-    hide : function(callback, scope){
-        if(this.animated){
-            this.hide.defer(50, this, [callback, scope]);
-            return;
-        }
-        Ext.EventManager.removeResizeListener(this.syncSize, this);
-        this.applyBounds(true, this.animate, true, callback, scope);
+    /**
+     * Hide the spotlight
+     */
+    hide: function(callback, scope) {
+        var me = this;
+        
+        Ext.EventManager.removeResizeListener(me.syncSize, me);
+
+        me.applyBounds(me.animate, true);
     },
 
-    doHide : function(){
-        this.active = false;
-        this.all.setDisplayed(false);
-    },
-
-    syncSize : function(){
+    /**
+     * Resizes the spotlight with the window size.
+     */
+    syncSize: function() {
         this.applyBounds(false, false);
     },
 
-    applyBounds : function(basePts, anim, doHide, callback, scope){
+    /**
+     * Resizes the spotlight depending on the arguments
+     * @param {Boolean} animate True to animate the changing of the bounds
+     * @param {Boolean} reverse True to reverse the animation
+     */
+    applyBounds: function(animate, reverse) {
+        var me = this,
+            box = me.el.getBox(),
+            //get the current view width and height
+            viewWidth = Ext.Element.getViewWidth(true),
+            viewHeight = Ext.Element.getViewHeight(true),
+            i = 0,
+            config = false,
+            from, to, clone;
+            
+        //where the element should start (if animation)
+        from = {
+            right: {
+                x: box.right,
+                y: viewHeight,
+                width: (viewWidth - box.right),
+                height: 0
+            },
+            left: {
+                x: 0,
+                y: 0,
+                width: box.x,
+                height: 0
+            },
+            top: {
+                x: viewWidth,
+                y: 0,
+                width: 0,
+                height: box.y
+            },
+            bottom: {
+                x: 0,
+                y: (box.y + box.height),
+                width: 0,
+                height: (viewHeight - (box.y + box.height)) + 'px'
+            }
+        };
 
-        var rg = this.el.getRegion();
+        //where the element needs to finish
+        to = {
+            right: {
+                x: box.right,
+                y: box.y,
+                width: (viewWidth - box.right) + 'px',
+                height: (viewHeight - box.y) + 'px'
+            },
+            left: {
+                x: 0,
+                y: 0,
+                width: box.x + 'px',
+                height: (box.y + box.height) + 'px'
+            },
+            top: {
+                x: box.x,
+                y: 0,
+                width: (viewWidth - box.x) + 'px',
+                height: box.y + 'px'
+            },
+            bottom: {
+                x: 0,
+                y: (box.y + box.height),
+                width: (box.x + box.width) + 'px',
+                height: (viewHeight - (box.y + box.height)) + 'px'
+            }
+        };
 
-        var dw = Ext.lib.Dom.getViewWidth(true);
-        var dh = Ext.lib.Dom.getViewHeight(true);
-
-        var c = 0, cb = false;
-        if(anim){
-            cb = {
-                callback: function(){
-                    c++;
-                    if(c == 4){
-                        this.animated = false;
-                        if(doHide){
-                            this.doHide();
-                        }
-                        Ext.callback(callback, scope, [this]);
-                    }
-                },
-                scope: this,
-                duration: this.duration,
-                easing: this.easing
-            };
-            this.animated = true;
+        //reverse the objects
+        if (reverse) {
+            clone = Ext.clone(from);
+            from = to;
+            to = clone;
         }
 
-        this.right.setBounds(
-                rg.right,
-                basePts ? dh : rg.top,
-                dw - rg.right,
-                basePts ? 0 : (dh - rg.top),
-                cb);
-
-        this.left.setBounds(
-                0,
-                0,
-                rg.left,
-                basePts ? 0 : rg.bottom,
-                cb);
-
-        this.top.setBounds(
-                basePts ? dw : rg.left,
-                0,
-                basePts ? 0 : dw - rg.left,
-                rg.top,
-                cb);
-
-        this.bottom.setBounds(
-                0,
-                rg.bottom,
-                basePts ? 0 : rg.right,
-                dh - rg.bottom,
-                cb);
-
-        if(!anim){
-            if(doHide){
-                this.doHide();
-            }
-            if(callback){
-                Ext.callback(callback, scope, [this]);
-            }
+        if (animate) {
+            Ext.Array.forEach(['right', 'left', 'top', 'bottom'], function(side) {
+                me[side].setBox(from[side]);
+                me[side].animate({
+                    duration: me.duration,
+                    easing: me.easing,
+                    to: to[side]
+                });
+            },
+            this);
+        } else {
+            Ext.Array.forEach(['right', 'left', 'top', 'bottom'], function(side) {
+                me[side].setBox(Ext.apply(from[side], to[side]));
+                me[side].repaint();
+            },
+            this);
         }
     },
 
-    destroy : function(){
-        this.doHide();
-        Ext.destroy(
-            this.right,
-            this.left,
-            this.top,
-            this.bottom);
-        delete this.el;
-        delete this.all;
+    /**
+     * Removes all the elements for the spotlight
+     */
+    destroy: function() {
+        var me = this;
+        
+        Ext.destroy(me.right, me.left, me.top, me.bottom);
+        delete me.el;
+        delete me.all;
     }
-};
-
-//backwards compat
-Ext.Spotlight = Ext.ux.Spotlight;
+});

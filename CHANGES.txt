@@ -1,10 +1,12 @@
 CHANGES
 *******
 
-3.3.2 (unreleased)
+4.2.1.883 (unreleased)
 ==================
 
-- Nothing changed yet.
+- Updated to newest ExtJs major version.
+- Include locale from extjs
+- Use Tox for running tests
 
 
 3.3.1 (2011-01-21)
