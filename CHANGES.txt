@@ -1,10 +1,10 @@
 CHANGES
 *******
 
-4.2.1.883 (unreleased)
-==================
+4.2.1.883 (2015-08-07)
+======================
 
-- Updated to newest ExtJs major version.
+- Updated to newest ExtJs 4 version.
 - Include locale from extjs
 - Use Tox for running tests
 
